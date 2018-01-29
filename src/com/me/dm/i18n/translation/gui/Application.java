@@ -8,6 +8,8 @@ import com.me.dm.i18n.translation.model.PropertiesManager;
 import com.me.dm.i18n.translation.model.PropertyTableModel;
 import com.me.dm.i18n.translation.model.PropertyTableModel.Property;
 
+import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -55,7 +57,7 @@ public class Application extends JFrame implements ActionListener, Colors {
     private Application(PreferencesManager preferencesManager, PropertiesManager propertiesManager) {
         this.preferencesManager = preferencesManager;
         this.propertiesManager = propertiesManager;
-        
+
         //Create and set up the window.
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Translation Check Tool");
@@ -73,9 +75,9 @@ public class Application extends JFrame implements ActionListener, Colors {
         filterDeletedButton.addActionListener(this);
         filterAddedButton.addActionListener(this);
         filterUntranslatedButton.addActionListener(this);
-        
+
         reloadButton.setEnabled(false);
-        
+
         resetFilters();
         filterDeletedButton.setEnabled(false);
         filterAddedButton.setEnabled(false);
@@ -90,15 +92,15 @@ public class Application extends JFrame implements ActionListener, Colors {
         addFilesPanel();
         addToolbar();
         addCopyCapability();
-        
+
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent winEvt) {
                 onExit();
             }
         });
-        
-        
+
+
     }
 
     private void resetFilters() {
@@ -117,16 +119,16 @@ public class Application extends JFrame implements ActionListener, Colors {
         addedLegend.setFont(boldFont);
         addedLegend.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
         addedLegend.setBackground(ADDED_COLOR);
-        
+
         deletedLegend.setOpaque(true);
         deletedLegend.setFont(boldFont);
         deletedLegend.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
         deletedLegend.setBackground(DELETED_COLOR);
-        
+
         untranslatedLegend.setOpaque(true);
         untranslatedLegend.setFont(boldFont);
         untranslatedLegend.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
-        untranslatedLegend.setBackground(UNTRANSLATED_COLOR);        
+        untranslatedLegend.setBackground(UNTRANSLATED_COLOR);
         legendPane.add(legendLabel);
         legendPane.add(deletedLegend);
         legendPane.add(addedLegend);
@@ -248,13 +250,13 @@ public class Application extends JFrame implements ActionListener, Colors {
             }
         }
     }
-    
+
     private void onExit() {
         try {
             preferencesManager.savePreferences();
         } catch (PreferencesException ex) {}
     }
-    
+
     /**
      * Create the GUI and show it. For thread safety, this method should be
      * invoked from the event-dispatching thread.
@@ -271,10 +273,16 @@ public class Application extends JFrame implements ActionListener, Colors {
         }
         frame.setVisible(true);
     }
-    
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws Exception {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
+
+      System.setProperty("file.encoding","UTF-8");
+      Field charset = Charset.class.getDeclaredField("defaultCharset");
+      charset.setAccessible(true);
+      charset.set(null,null);
+
         javax.swing.SwingUtilities.invokeLater(() -> {
             DictionnaryManager dictionnaryManager = new DictionnaryManager();
             final PropertiesManager propertiesManager = new PropertiesManager(dictionnaryManager);
