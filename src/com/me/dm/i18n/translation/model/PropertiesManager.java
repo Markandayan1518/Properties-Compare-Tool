@@ -26,12 +26,17 @@ public class PropertiesManager {
 
   public PropertiesManager(DictionnaryManager dictionnaryManager) {
     this.dictionnaryManager = dictionnaryManager;
+    init();
+  }
+
+  private void init() {
     this.added = 0;
     this.delete = 0;
     this.nonTranslated = 0;
   }
 
   public Properties readProperties(File f) throws TranslationException {
+    init();
     Properties p = new Properties();
     try (FileReader reader = new FileReader(f)) {
       p.load(reader);
@@ -87,9 +92,9 @@ public class PropertiesManager {
     return result;
   }
 
-  public void export(Application application, PropertyTableModel tableModel) throws PreferencesException {
+  public void export(Application application, PropertyTableModel tableModel, String fileName) throws PreferencesException {
     String newLine = System.getProperty("line.separator");
-    File f = new File(System.getProperty("java.io.tmpdir") + "/translations-export.csv");
+    File f = new File(System.getProperty("java.io.tmpdir") + File.separator+ fileName +".csv");
     try (FileWriter fw = new FileWriter(f)) {
       for (int i = 0; i < tableModel.getRowCount(); i++) {
         final PropertyTableModel.Property prop = tableModel.getModel(i);
